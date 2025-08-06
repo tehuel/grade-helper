@@ -38,32 +38,12 @@ class DatabaseSeeder extends Seeder
                 ->create();
 
             foreach ($courseAssessments as $assessment) {
-                $gradingType = $assessment->grading_type;
-                $gradingValue = $this->getGradingValueForType($gradingType);
-
-                // create grades for some students
-                Grade::factory(rand(0, 3))
+                $gradeFactory = Grade::factory(rand(0, 3))
                     ->for($assessment)
                     ->for($selectedStudents->random(), 'student')
-                    ->create([
-                        'type' => $gradingType,
-                        'value' => $gradingValue,
-                    ]);
+                    ->{$assessment->grading_type}() // Call grading_type state method
+                    ->create();
             }
-        }
-    }
-
-    private function getGradingValueForType(string $type): ?string
-    {
-        switch ($type) {
-            case 'numeric':
-                return (string) rand(0, 100);
-            case 'pass_fail':
-                return rand(0, 1) ? 'Pass' : 'Fail';
-            case 'letter':
-                return collect(['A', 'B', 'C', 'D', 'F'])->random();
-            default:
-                return null;
         }
     }
 }

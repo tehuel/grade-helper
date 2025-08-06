@@ -25,18 +25,49 @@ class GradeFactory extends Factory
             'value' => $gradeValue,
             'assessment_id' => Assessment::factory(),
             'student_id' => User::factory(),
+            'comment' => $this->faker->sentence,
         ];
+    }
+
+    public function numeric(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'type' => 'numeric',
+                'value' => $this->getGradeValueForType('numeric'),
+            ];
+        });
+    }
+
+    public function pass_fail(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'type' => 'pass_fail',
+                'value' => $this->getGradeValueForType('pass_fail'),
+            ];
+        });
+    }
+
+    public function letter(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'type' => 'letter',
+                'value' => $this->getGradeValueForType('letter'),
+            ];
+        });
     }
 
     private function getGradeValueForType(string $type): ?string
     {
         switch ($type) {
             case 'numeric':
-                return (string) rand(0, 100);
+                return (string) $this->faker->numberBetween(0, 100);
             case 'pass_fail':
-                return rand(0, 1) ? 'Pass' : 'Fail';
+                return $this->faker->boolean() ? 'Pass' : 'Fail';
             case 'letter':
-                return collect(['A', 'B', 'C', 'D', 'F'])->random();
+                return $this->faker->randomElement(['A', 'B', 'C', 'D', 'F']);
             default:
                 return null;
         }
