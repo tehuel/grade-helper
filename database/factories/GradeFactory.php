@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Assessment;
-use App\Models\User;
+use App\Models\Student;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Grade>
@@ -24,7 +24,7 @@ class GradeFactory extends Factory
             'type' => $gradeType,
             'value' => $gradeValue,
             'assessment_id' => Assessment::factory(),
-            'student_id' => User::factory(),
+            'student_id' => Student::factory(),
             'comment' => $this->faker->sentence,
         ];
     }

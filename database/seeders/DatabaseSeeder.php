@@ -3,11 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\Assessment;
+use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Grade;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+const STUDENTS_COUNT = 10;
+const TEACHERS_COUNT = 2;
+const COURSES_COUNT = 3;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,34 +22,59 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $initialTeacher = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        Teacher::factory()
+            ->for(
+                User::factory()->create([
+                    'email' => 'teacher@example.com',
+                ])
+            )
+            ->create([
+                'first_name' => 'Test',
+                'last_name' => 'Teacher',
+            ]);
 
-        $teachers = User::factory(3)->create()->push($initialTeacher);
-        $students = User::factory(10)->create();
-        $courses = Course::Factory(5)->create();
-        
-        foreach ($courses as $course) {
-            $selectedTeachers = $teachers->random(2);
-            $course->teachers()->attach($selectedTeachers->pluck('id')->toArray());
+        Student::factory()
+            ->for(
+                User::factory()->create([
+                    'email' => 'student@example.com',
+                ])
+            )
+            ->create([
+                'first_name' => 'Test',
+                'last_name' => 'Student',
+                'github_username' => 'tehuel',
+            ]);
 
-            $selectedStudents = $students->random(rand(1, 5));
-            $course->students()->attach($selectedStudents->pluck('id')->toArray());
+        Student::factory(STUDENTS_COUNT)->create();
+        Teacher::factory(TEACHERS_COUNT)->create();
+        Course::factory(COURSES_COUNT)->create();
+
+        $allCourses = Course::all();
+        $allTeachers = Teacher::all();
+        $allStudents = Student::all();
+        $studentGroups = $allStudents->split($allCourses->count());
+
+        foreach ($allCourses as $index => $course) {
+            $selectedTeachers = $allTeachers->random(2);
+            $selectedStudents = $studentGroups[$index];
+
+            $course->teachers()->attach($selectedTeachers);
+            $course->students()->attach($selectedStudents);
 
             // Create assessments for each course
-            $courseAssessments = Assessment::factory(rand(2, 4))
+            $courseAssessments = Assessment::factory(rand(1, 5))
                 ->for($course)
-                ->create();
+                ->create()
+                ->each(function ($assessment) use ($selectedStudents) {
+                    // create grades for each assessment
+                    Grade::factory()
+                        ->count(rand(0, 3))
+                        ->for($assessment)
+                        ->recycle($selectedStudents)
+                        ->{$assessment->grading_type}() // Call grading_type state method
+                        ->create();
+                });
 
-            foreach ($courseAssessments as $assessment) {
-                $gradeFactory = Grade::factory(rand(0, 3))
-                    ->for($assessment)
-                    ->for($selectedStudents->random(), 'student')
-                    ->{$assessment->grading_type}() // Call grading_type state method
-                    ->create();
-            }
         }
     }
 }

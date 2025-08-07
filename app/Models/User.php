@@ -48,20 +48,15 @@ class User extends Authenticatable
         ];
     }
 
-    public function coursesAsTeacher(): BelongsToMany
+    // get the student profile related with the user
+    public function student(): hasOne
     {
-        return $this->belongsToMany(Course::class, 'course_teachers', 'teacher_id', 'course_id')
-            ->withTimestamps();
+        return $this->hasOne(Student::class);
     }
 
-    public function coursesAsStudent(): BelongsToMany
+    // get the teacher profile related with the user
+    public function teacher(): hasOne
     {
-        return $this->belongsToMany(Course::class, 'course_students', 'student_id', 'course_id')
-            ->withTimestamps();
-    }
-
-    public function grades(): HasMany
-    {
-        return $this->hasMany(Grade::class, 'student_id');
+        return $this->hasOne(Teacher::class);
     }
 }

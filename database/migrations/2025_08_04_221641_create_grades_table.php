@@ -19,7 +19,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->foreignId('student_id')
-                ->constrained('users')
+                ->constrained()
                 ->onDelete('cascade');
 
             // Type of grading ('numeric', 'pass_fail', 'letter')

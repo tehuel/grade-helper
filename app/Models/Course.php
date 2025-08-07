@@ -19,14 +19,12 @@ class Course extends Model
 
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'course_teachers', 'course_id', 'teacher_id')
-            ->withTimestamps();
+        return $this->belongsToMany(Teacher::class)->withTimestamps();
     }
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'course_students', 'course_id', 'student_id')
-            ->withTimestamps();
+        return $this->belongsToMany(Student::class)->withTimestamps();
     }
 
     public function assessments(): HasMany

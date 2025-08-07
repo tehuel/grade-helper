@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('course_students', function (Blueprint $table) {
+        Schema::create('course_student', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('course_id')
@@ -19,7 +19,7 @@ return new class extends Migration
                 ->onDelete('cascade'); // Delete enrollments if course is deleted
 
             $table->foreignId('student_id')
-                ->constrained('users')
+                ->constrained()
                 ->onDelete('cascade'); // Delete enrollment if student is deleted
 
             $table->unique(['course_id', 'student_id']);
